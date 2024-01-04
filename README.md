@@ -5,10 +5,14 @@ This script integrates with Google Calendar using the Google Calendar API to sch
 
 ## Setup and Usage
 
-Install necessary libraries: google-api-python-client and google-auth.
-Set up Google Cloud service account and download the credentials file.
-Replace 'path/to/service_account.json' with the path to your credentials file in the script.
-Running the Script:
+Install Required Libraries:
+Ensure you have the google-auth, google-auth-oauthlib, and google-auth-httplib2 libraries installed.
+
+Set Up OAuth 2.0 Credentials:
+
+Go to the Google Cloud Console.
+Create OAuth 2.0 credentials for a desktop application.
+Download the credentials JSON file.
 
 Execute the script: python script_name.py.
 The script listens for event scheduling commands (e.g., "Schedule a meeting with John on January 10 at 10 am") and processes these requests to add events to your Google Calendar.
