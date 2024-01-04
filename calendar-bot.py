@@ -13,7 +13,7 @@ with open('config.json', 'r') as config_file:
 
 # Scopes and OAuth 2.0 Credentials File
 SCOPES = ['https://www.googleapis.com/auth/calendar']
-CREDENTIALS_FILE = 'path/to/credentials.json'
+CREDENTIALS_FILE = 'client_secret.json'
 CALENDAR_ID = 'primary'  # or your calendar ID
 
 def get_calendar_service():
@@ -68,7 +68,7 @@ def add_calendar_event(event_summary, event_location, event_description, start_t
 def provide_user_specific_recommendations():
     messages = [
         {"role": "system", "content": "You are an AI that schedules events in a Google Calendar."},
-        {"role": "user", "content": "Schedule a meeting with John on January 10 at 10 am."}
+        {"role": "user", "content": "Schedule a meeting with John on January 10, 2024 at 10 am."}
     ]
 
     response = client.chat.completions.create(
@@ -100,6 +100,11 @@ def provide_user_specific_recommendations():
         function_call = response.choices[0].message.function_call
         if function_call.name == "add_calendar_event":
             args = json.loads(function_call.arguments)
+
+            # Debug information
+            print("Function call name:", function_call.name)
+            print("Arguments received:", args)
+
             return add_calendar_event(args['event_summary'], args['event_location'], args['event_description'], args['start_time'], args['end_time'], args['start_time_zone'], args['end_time_zone'])
 
     return "I am sorry, but I could not understand your request."
