@@ -3,6 +3,11 @@ from googleapiclient.discovery import build
 from google.oauth2 import service_account
 from openai import OpenAI
 
+# Read configuration file for API keys
+with open('config.json', 'r') as config_file:
+    config = json.load(config_file)
+    openai_api_key = config['openai_api_key']
+
 # Google Calendar API settings
 SERVICE_ACCOUNT_FILE = 'path/to/service_account.json'
 SCOPES = ['https://www.googleapis.com/auth/calendar']
@@ -13,7 +18,7 @@ credentials = service_account.Credentials.from_service_account_file(
     SERVICE_ACCOUNT_FILE, scopes=SCOPES)
 service = build('calendar', 'v3', credentials=credentials)
 
-client = OpenAI(api_key='*****')
+client = OpenAI(api_key=openai_api_key)
 
 def add_calendar_event(event_summary, event_location, event_description, start_time, end_time, start_time_zone, end_time_zone):
     """
