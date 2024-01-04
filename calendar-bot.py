@@ -1,6 +1,9 @@
 import json
+import os
+import pickle
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
-from google.oauth2 import service_account
 from openai import OpenAI
 
 # Read configuration file for API keys
@@ -8,15 +11,34 @@ with open('config.json', 'r') as config_file:
     config = json.load(config_file)
     openai_api_key = config['openai_api_key']
 
-# Google Calendar API settings
-SERVICE_ACCOUNT_FILE = 'path/to/service_account.json'
+# Scopes and OAuth 2.0 Credentials File
 SCOPES = ['https://www.googleapis.com/auth/calendar']
+CREDENTIALS_FILE = 'path/to/credentials.json'
 CALENDAR_ID = 'primary'  # or your calendar ID
 
-# Initialize Google Calendar API client
-credentials = service_account.Credentials.from_service_account_file(
-    SERVICE_ACCOUNT_FILE, scopes=SCOPES)
-service = build('calendar', 'v3', credentials=credentials)
+def get_calendar_service():
+    creds = None
+    # Load the saved credentials if they exist
+    if os.path.exists('token.pickle'):
+        with open('token.pickle', 'rb') as token:
+            creds = pickle.load(token)
+
+    # If there are no valid credentials, prompt the user to log in
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(CREDENTIALS_FILE, SCOPES)
+            creds = flow.run_local_server(port=0)
+        # Save the credentials for the next run
+        with open('token.pickle', 'wb') as token:
+            pickle.dump(creds, token)
+
+    service = build('calendar', 'v3', credentials=creds)
+    return service
+
+# Initialize the Google Calendar API client using OAuth
+service = get_calendar_service()
 
 client = OpenAI(api_key=openai_api_key)
 
